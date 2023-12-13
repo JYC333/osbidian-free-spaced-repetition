@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
+	"id": "obsidian-free-spaced-repetition",
+	"name": "Obsidian Free Spaced Repetition",
+	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "Free spaced repetition for Obsidian notes",
+	"author": "JYC333",
+	"authorUrl": "https://github.com/JYC333/osbidian-free-spaced-repetition",
+	"fundingUrl": "https://ko-fi.com/G2G7RXRRO",
 	"isDesktopOnly": false
 }
