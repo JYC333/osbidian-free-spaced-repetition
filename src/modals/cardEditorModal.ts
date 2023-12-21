@@ -52,11 +52,12 @@ export class CardEditorModal extends Modal {
 		this.contentEl.empty();
 		this.question = null;
 		this.answer = null;
-		console.log(this.editing);
-		updateView(this.plugin, {
-			fileName: this.file.path,
-			cardIndex: this.editing.ind,
-		});
+		if (this.editing) {
+			updateView(this.plugin, {
+				fileName: this.file.path,
+				cardIndex: this.editing.ind,
+			});
+		}
 		this.editing = null;
 	}
 
@@ -119,7 +120,7 @@ export class CardEditorModal extends Modal {
 			});
 			new ButtonComponent(buttonContainer)
 				.setIcon("trash-2")
-				.setClass("fsr-delete-button")
+				.setWarning()
 				.onClick(() => {
 					new CardDeletionWarningModal(this.app, (result) => {
 						if (result) {

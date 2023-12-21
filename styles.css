@@ -32,10 +32,6 @@
 	justify-content: space-evenly;
 }
 
-.fsr-card-button-container .fsr-delete-button {
-	background-color: #fb464c;
-}
-
 .fsr-edit-card-edit {
 	width: 100%;
 	padding-left: 1%;

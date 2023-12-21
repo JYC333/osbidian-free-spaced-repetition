@@ -113,9 +113,8 @@ export default class FreeSpacedRepetition extends Plugin {
 					) {
 						new NoteDeletionWarningModal(
 							this.app,
-							this.dataStore.data.trackedNotes[
-								folderOrFile.path
-							].length,
+							this,
+							folderOrFile.path,
 							async (result) => {
 								console.log(result);
 							}

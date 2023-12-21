@@ -118,7 +118,6 @@ export async function updateView(
 		plugin.sidebarView.refresh();
 	}
 	const currentView = plugin.currentView;
-	console.log(currentView.getState().mode);
 	if (currentView) {
 		switch (currentView.getState().mode) {
 			case "deck":
