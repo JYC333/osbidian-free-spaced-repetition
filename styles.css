@@ -1,3 +1,123 @@
+.fsr-edit-mod {
+	display: flex;
+	flex-direction: row;
+	height: 80vh;
+	overflow: hidden;
+}
+
+.fsr-edit-card-list {
+	width: 35%;
+	overflow: scroll;
+}
+
+.fsr-floating-card {
+	padding: 5px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+}
+
+.fsr-floating-card-container {
+	max-height: 20vh;
+	overflow: scroll;
+}
+
+@media (prefers-color-scheme: dark) {
+	.fsr-floating-card {
+		box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* 浅色阴影 */
+	}
+}
+
+.fsr-card-button-container {
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.fsr-card-button-container .fsr-delete-button {
+	background-color: #fb464c;
+}
+
+.fsr-edit-card-edit {
+	width: 100%;
+	padding-left: 1%;
+	display: flex;
+	flex-direction: column;
+}
+
+.fsr-edit-question {
+	height: 40%;
+	flex-grow: 1;
+}
+
+.fsr-edit-answer {
+	height: 40%;
+	flex-grow: 1;
+}
+
+.fsr-edit-button-container {
+	height: 10%;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.fsr-edit-title {
+	height: 20%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.fsr-edit-toggle {
+	width: 135px;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.fsr-edit-content {
+	height: 80%;
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+}
+
+.fsr-edit-text {
+	width: 50%;
+	height: 100%;
+	flex-grow: 1;
+}
+
+.fsr-edit-preview {
+	padding-left: 3%;
+	width: 50%;
+	height: 100%;
+	flex-grow: 1;
+	overflow: scroll;
+}
+
+.fsr-edit-left {
+	width: 47.5%;
+	height: 100%;
+	flex-grow: 1;
+	overflow: scroll;
+}
+
+.fsr-edit-button-move {
+	width: 5%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.fsr-edit-right {
+	width: 47.5%;
+	height: 100%;
+	flex-grow: 1;
+	overflow: scroll;
+}
+
 /* ------------------------------ fsr main page ------------------------------- */
 .fsr-wrapper {
 	position: relative;

@@ -1,4 +1,4 @@
-import { FSRSettings } from "src/types";
+import { FSRSettings, Filter } from "src/types";
 
 const fsrsJs = require("fsrs.js");
 
@@ -23,7 +23,29 @@ export const DEFAULT_SETTINGS: FSRSettings = {
 };
 
 export const PLUGIN_DATA_PATH: string =
-	"./.obsidian/plugins/obsidian-free-spaced-repetition/tracked_files.json";
+	"./.obsidian/plugins/obsidian-free-spaced-repetition/FSRData.json";
+
+export const DEFAULT_FILTER: Filter = {
+	cardState: [],
+	decks: [],
+};
+
+export const IMAGE_FORMATS = [
+	"jpg",
+	"jpeg",
+	"gif",
+	"png",
+	"svg",
+	"webp",
+	"apng",
+	"avif",
+	"jfif",
+	"pjpeg",
+	"pjp",
+	"bmp",
+];
+export const AUDIO_FORMATS = ["mp3", "webm", "m4a", "wav", "ogg"];
+export const VIDEO_FORMATS = ["mp4", "mkv", "avi", "mov"];
 
 export enum DataLocation {
 	PluginFolder = "In Plugin Folder",
@@ -33,4 +55,9 @@ export enum DataLocation {
 export enum DeckType {
 	FolderDeck = "FolderDeck",
 	CustomizedDeck = "CustomizedDeck",
+}
+
+export enum FilterType {
+	CardState = "CardState",
+	Decks = "Decks",
 }

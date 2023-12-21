@@ -6,6 +6,8 @@ const fsrsJs = require("fsrs.js");
 
 const DEFAULT_SR_DATA: FSRData = {
 	trackedNotes: {},
+	folderDeck: {},
+	customizedDeck: {},
 	reviewSettings: { Default: new fsrsJs.FSRS() },
 	templates: {},
 };

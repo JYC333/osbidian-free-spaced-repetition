@@ -1,9 +1,14 @@
 import { TFile, WorkspaceLeaf } from "obsidian";
 import { Card } from "src/types";
 import FreeSpacedRepetition from "src/main";
-import { switchView, updateView } from "src/utils";
+import { CardEditorModal } from "src/modals/cardEditorModal";
+import {
+	switchView,
+	updateView,
+	getFolderPath,
+	checkExistence,
+} from "src/utils/utils";
 
-import isEqual from "lodash/isEqual";
 const fsrsJs = require("fsrs.js");
 
 export default class Commands {
@@ -53,36 +58,46 @@ export default class Commands {
 
 	createCard(file: TFile) {
 		const fileName = file.path;
-		if (!this.plugin.dataStore.data.trackedNotes.hasOwnProperty(fileName)) {
-			this.plugin.dataStore.data.trackedNotes[fileName] = [];
+		const { data } = this.plugin.dataStore;
+		if (!data.trackedNotes.hasOwnProperty(fileName)) {
+			data.trackedNotes[fileName] = [];
 		}
 		const fileCache = this.plugin.app.metadataCache.getFileCache(file);
-		console.log(fileCache);
 		const newCard: Card = {
 			question: file.basename,
-			answer: {
-				start: 0,
-				// @ts-ignore
-				end: fileCache?.sections[fileCache.sections?.length - 1]
-					.position.end.offset,
-			},
+			answer: [
+				{
+					start: 0,
+					// @ts-ignore
+					end: fileCache?.sections[fileCache.sections?.length - 1]
+						.position.end.offset,
+				},
+			],
 			type: "basic",
-			deck: [],
+			decks: [],
 			FSRInfo: new fsrsJs.Card(),
 		};
 
-		const cardInd = this.checkDuplicate(
-			newCard,
-			this.plugin.dataStore.data.trackedNotes[fileName]
-		);
+		const cardInd = checkExistence(newCard, data.trackedNotes[fileName]);
 
 		if (cardInd === -1) {
-			this.plugin.dataStore.data.trackedNotes[fileName].push(newCard);
+			data.trackedNotes[fileName].push(newCard);
 
 			console.log(`Create card for note: ${fileName}`);
 		} else {
 			console.log(`Card duplicated for note: ${fileName}`);
 		}
+
+		const deck = getFolderPath(fileName, this.plugin);
+		if (!data.folderDeck.hasOwnProperty(deck)) {
+			data.folderDeck[deck] = [fileName];
+		} else {
+			data.folderDeck[deck] = [
+				...new Set([...data.folderDeck[deck], fileName]),
+			];
+		}
+		new CardEditorModal(this.plugin.app, file, this.plugin).open();
+
 		this.plugin.dataStore.save();
 		updateView(this.plugin);
 		// this.plugin.currentView.deckView.refreshView();
@@ -98,17 +113,5 @@ export default class Commands {
 		// 		)
 		// 	);
 		// });
-	}
-
-	checkDuplicate(newCard: Card, cardList: Card[]) {
-		for (let i = 0; i < cardList.length; i++) {
-			if (
-				isEqual(newCard.question, cardList[i].question) &&
-				isEqual(newCard.answer, cardList[i].answer)
-			) {
-				return i;
-			}
-		}
-		return -1;
 	}
 }

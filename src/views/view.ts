@@ -8,9 +8,9 @@ import {
 import { DeckType } from "src/constants";
 import FreeSpacedRepetition from "src/main";
 import { FSRSubView, ReviewMode, ReviewCard } from "src/types";
-import { switchView, openBrowseSidebar } from "src/utils";
 
 import { t } from "src/lang/utils";
+import { switchView, openBrowseSidebar, updateView } from "src/utils/utils";
 import { DeckView } from "src/views/deckView";
 import { ReviewView } from "src/views/reviewView";
 import { BrowseView } from "src/views/browseView";
@@ -71,11 +71,15 @@ export class FSRView extends ItemView {
 
 		new ButtonComponent(decksButton)
 			.setButtonText(t("DECKS"))
-			.onClick(() => switchView(this.plugin, { mode: "deck" }))
+			.onClick(() => {
+				setTimeout(() => updateView(this.plugin), 1);
+				switchView(this.plugin, { mode: "deck" });
+			})
 			.setClass("fsr-tabs-decks");
 		new ButtonComponent(browseButton)
 			.setButtonText(t("BROWSE"))
 			.onClick(() => {
+				setTimeout(() => updateView(this.plugin), 1);
 				switchView(this.plugin, { mode: "browse" });
 				openBrowseSidebar(this.plugin);
 			})
@@ -94,7 +98,7 @@ export class FSRView extends ItemView {
 
 		new ButtonComponent(editButton)
 			.setButtonText(t("EDIT"))
-			.onClick(() => new Notice("Not Implemented"))
+			.onClick(() => this.reviewView.openCardEditor())
 			.setClass("fsr-tabs-edit");
 
 		this.currentView.hide();
@@ -140,7 +144,7 @@ export class FSRView extends ItemView {
 						reviewQueue.push(cardForReview);
 					} else if (
 						state.deckType === DeckType.CustomizedDeck &&
-						card.deck.contains(state.deck)
+						card.decks.contains(state.deck)
 					) {
 						reviewQueue.push(cardForReview);
 					}
@@ -149,10 +153,14 @@ export class FSRView extends ItemView {
 			this.currentQueue = reviewQueue;
 		}
 
-		this.currentView.set(this.currentQueue, {
-			deck: this.deck,
-			deckType: this.deckType,
-		});
+		this.currentView.set(
+			this.currentQueue,
+			{
+				deck: this.deck,
+				deckType: this.deckType,
+			},
+			state.pointer
+		);
 	}
 
 	getState(): any {

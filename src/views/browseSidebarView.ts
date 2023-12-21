@@ -1,6 +1,8 @@
 import { WorkspaceLeaf, ItemView } from "obsidian";
+import { DEFAULT_FILTER, FilterType } from "src/constants";
 import FreeSpacedRepetition from "src/main";
-import { calculateTotalHeight, getFolderPath } from "src/utils";
+import { calculateTotalHeight, changeFilter } from "src/utils/utils";
+import { Filter } from "src/types";
 
 import { t } from "src/lang/utils";
 
@@ -13,6 +15,10 @@ export class BrowseSidebarView extends ItemView {
 	cardState: any[];
 	decks: any[];
 
+	filter: Filter = DEFAULT_FILTER;
+
+	rootTitle: string[] = [t("SIDEBAR_CARD_STATE"), t("SIDEBAR_CARD_DECKS")];
+
 	constructor(leaf: WorkspaceLeaf, plugin: FreeSpacedRepetition) {
 		super(leaf);
 		this.plugin = plugin;
@@ -22,7 +28,6 @@ export class BrowseSidebarView extends ItemView {
 		container.empty();
 
 		let wrapperEl = container.createDiv("fsr-browser-wrapper");
-		// 在此处创建你的界面内容
 		let headEl = wrapperEl.createDiv("fsr-browser-head");
 		headEl.createEl("span", { text: "FSR Browser" });
 		this.contentEl = wrapperEl.createDiv("fsr-browser-content");
@@ -30,26 +35,26 @@ export class BrowseSidebarView extends ItemView {
 		this.cardState = [
 			{
 				title: t("SIDEBAR_CARD_STATE"),
-				type: "CardState",
+				type: FilterType.CardState,
 				children: [
 					{
 						title: t("SIDEBAR_CARD_STATE_NEW"),
-						type: "CardState",
+						type: FilterType.CardState,
 						children: [],
 					},
 					{
 						title: t("SIDEBAR_CARD_STATE_LEARNING"),
-						type: "CardState",
+						type: FilterType.CardState,
 						children: [],
 					},
 					{
 						title: t("SIDEBAR_CARD_STATE_REVIEW"),
-						type: "CardState",
+						type: FilterType.CardState,
 						children: [],
 					},
 					{
 						title: t("SIDEBAR_CARD_STATE_RELEARNING"),
-						type: "CardState",
+						type: FilterType.CardState,
 						children: [],
 					},
 				],
@@ -58,7 +63,7 @@ export class BrowseSidebarView extends ItemView {
 		this.decks = [
 			{
 				title: t("SIDEBAR_CARD_DECKS"),
-				type: "Deck",
+				type: FilterType.Decks,
 				children: this.getDecks(),
 			},
 		];
@@ -70,14 +75,14 @@ export class BrowseSidebarView extends ItemView {
 			0
 		);
 
-		const rootTitle = [t("SIDEBAR_CARD_STATE"), t("SIDEBAR_CARD_DECKS")];
 		setTimeout(() => {
 			this.contentEl
 				.querySelectorAll(".collapsible-header-deck")
 				.forEach((item) => {
-					let title =
-						item.querySelector(".collapsible-title")?.textContent;
-					if (title && rootTitle.contains(title)) {
+					let title = item.querySelector(
+						".collapsible-title-sidebar"
+					)?.textContent;
+					if (title && this.rootTitle.contains(title)) {
 						// @ts-ignore
 						let content = item.parentElement.nextElementSibling;
 						// @ts-ignore
@@ -191,14 +196,40 @@ export class BrowseSidebarView extends ItemView {
 		const content = deck.createEl("div", "collapsible-header-content");
 
 		const plugin = this.plugin;
+		const filter = this.filter;
+		const rootTitle = this.rootTitle;
+
+		header.addEventListener("click", function (event: any) {
+			let title = this.querySelector(
+				".collapsible-title-sidebar"
+			)?.textContent;
+			if (
+				event.target.className !== "collapsible-symbol" &&
+				!rootTitle.contains(title)
+			) {
+				let condition;
+				if (type === FilterType.Decks) {
+					condition = fullPath.slice(
+						FilterType.Decks.length + 1,
+						fullPath.length
+					);
+				} else {
+					condition = title;
+				}
+
+				changeFilter(this, type, condition, filter);
+				console.log(filter);
+				plugin.currentView.browseView.filterTableData(filter);
+			}
+		});
 
 		if (children.length > 0) {
 			const symbol = content.createEl("span", {
 				cls: "collapsible-symbol",
 				text: "+ ",
 			});
-			const titleEl = content.createEl("span", {
-				cls: "collapsible-title",
+			content.createEl("span", {
+				cls: "collapsible-title-sidebar",
 				text: title,
 			});
 
@@ -208,7 +239,6 @@ export class BrowseSidebarView extends ItemView {
 				const content =
 					this.parentElement.parentElement.parentElement
 						.nextElementSibling;
-				console.log(content);
 				if (content.style.maxHeight) {
 					content.style.maxHeight = null;
 				} else {
@@ -216,22 +246,14 @@ export class BrowseSidebarView extends ItemView {
 						calculateTotalHeight(content) + "px";
 				}
 			});
-
-			titleEl.addEventListener("click", function () {
-				console.log("jump to deck review page:", title, type, fullPath);
-			});
 		} else {
 			content.createEl("span", {
 				cls: "collapsible-symbol-occupy",
 				text: "  ",
 			});
-			const titleEl = content.createEl("span", {
-				cls: "collapsible-title",
+			content.createEl("span", {
+				cls: "collapsible-title-sidebar",
 				text: title,
-			});
-
-			titleEl.addEventListener("click", function () {
-				console.log("jump to deck review page:", title, type, fullPath);
 			});
 		}
 
@@ -252,15 +274,19 @@ export class BrowseSidebarView extends ItemView {
 
 	getDecks() {
 		let decks: Record<string, any> = {};
-		for (let note in this.plugin.dataStore.data.trackedNotes) {
-			let folderPath = getFolderPath(note, this.plugin);
-			this.plugin.dataStore.data.trackedNotes[note].map((d) => {
-				if (!decks.hasOwnProperty(folderPath)) {
-					decks[folderPath] = {};
-				}
-			});
+		const { data } = this.plugin.dataStore;
+
+		for (let deck in data.folderDeck) {
+			if (!decks.hasOwnProperty(deck)) {
+				decks[deck] = {};
+			}
 		}
-		console.log(decks);
+
+		for (let deck in data.customizedDeck) {
+			if (!decks.hasOwnProperty(deck)) {
+				decks[deck] = {};
+			}
+		}
 
 		return this.formatDecks(decks);
 	}
@@ -296,7 +322,7 @@ export class BrowseSidebarView extends ItemView {
 		keys.forEach((k: string) => {
 			let item = {
 				title: k,
-				type: "Deck",
+				type: FilterType.Decks,
 				children: this.formatDeckList(deck[k]),
 			};
 			deckList.push(item);

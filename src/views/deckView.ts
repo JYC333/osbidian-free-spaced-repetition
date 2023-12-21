@@ -2,9 +2,9 @@ import { Notice } from "obsidian";
 import { DeckType } from "src/constants";
 import FreeSpacedRepetition from "src/main";
 import { FSRSubView, ReviewCard } from "src/types";
-import { switchView, calculateTotalHeight, getFolderPath } from "src/utils";
 
 import { t } from "src/lang/utils";
+import { switchView, calculateTotalHeight } from "src/utils/utils";
 import { FSRView } from "src/views/view";
 
 import isEqual from "lodash/isEqual";
@@ -252,38 +252,69 @@ export class DeckView implements FSRSubView {
 		let folderDeck: Record<string, any> = {};
 		let customizedDeck: Record<string, any> = {};
 		const stateMap = ["newCard", "learning", "review"];
-		for (let note in this.plugin.dataStore.data.trackedNotes) {
-			let folderPath = getFolderPath(note, this.plugin);
-			this.plugin.dataStore.data.trackedNotes[note].map((d) => {
-				let state =
-					(d.FSRInfo.state as number) > 2
-						? 1
-						: (d.FSRInfo.state as number);
-				if (!folderDeck.hasOwnProperty(folderPath)) {
-					folderDeck[folderPath] = {
-						newCard: 0,
-						learning: 0,
-						review: 0,
-					};
-				}
-				if ((d.FSRInfo.due as Date).getTime() < new Date().getTime()) {
-					folderDeck[folderPath][stateMap[state]] += 1;
-				}
-				d.deck.map((p) => {
-					if (!customizedDeck.hasOwnProperty(p)) {
-						customizedDeck[p] = {
-							newCard: 0,
-							learning: 0,
-							review: 0,
-						};
-					}
+		const { data } = this.plugin.dataStore;
+
+		for (let deck in data.folderDeck) {
+			if (!folderDeck.hasOwnProperty(deck)) {
+				folderDeck[deck] = {
+					newCard: 0,
+					learning: 0,
+					review: 0,
+				};
+			}
+			for (let note of data.folderDeck[deck]) {
+				for (let card of data.trackedNotes[note]) {
+					let state =
+						(card.FSRInfo.state as number) > 2
+							? 1
+							: (card.FSRInfo.state as number);
 					if (
-						(d.FSRInfo.due as Date).getTime() < new Date().getTime()
+						(card.FSRInfo.due as Date).getTime() <
+						new Date().getTime()
 					) {
-						customizedDeck[p][stateMap[state]] += 1;
+						folderDeck[deck][stateMap[state]] += 1;
 					}
-				});
-			});
+				}
+			}
+		}
+
+		for (let deck in data.customizedDeck) {
+			if (!customizedDeck.hasOwnProperty(deck)) {
+				customizedDeck[deck] = {
+					newCard: 0,
+					learning: 0,
+					review: 0,
+				};
+			}
+			for (let cards of data.customizedDeck[deck]) {
+				if (cards.cardIndex === -1) {
+					for (let card of data.trackedNotes[cards.fileName]) {
+						let state =
+							(card.FSRInfo.state as number) > 2
+								? 1
+								: (card.FSRInfo.state as number);
+						if (
+							(card.FSRInfo.due as Date).getTime() <
+							new Date().getTime()
+						) {
+							customizedDeck[deck][stateMap[state]] += 1;
+						}
+					}
+				} else {
+					let FSRInfo =
+						data.trackedNotes[cards.fileName][cards.cardIndex]
+							.FSRInfo;
+					let state =
+						(FSRInfo.state as number) > 2
+							? 1
+							: (FSRInfo.state as number);
+					if (
+						(FSRInfo.due as Date).getTime() < new Date().getTime()
+					) {
+						customizedDeck[deck][stateMap[state]] += 1;
+					}
+				}
+			}
 		}
 
 		return [this.formatDecks(folderDeck), this.formatDecks(customizedDeck)];
@@ -291,7 +322,7 @@ export class DeckView implements FSRSubView {
 
 	formatDecks(decks: Record<string, any>) {
 		let paths = {};
-		for (let path in decks) {
+		for (let path of Object.keys(decks).sort()) {
 			this.formatPathObject(paths, path, decks[path]);
 		}
 		return this.formatDeckList(paths);
@@ -325,19 +356,20 @@ export class DeckView implements FSRSubView {
 				let item = {
 					title: k,
 					children: this.formatDeckList(deck[k]),
-					newCard: 0,
-					learning: 0,
-					review: 0,
+					newCard: deck[k].hasOwnProperty("newCard")
+						? deck[k]["newCard"]
+						: 0,
+					learning: deck[k].hasOwnProperty("learning")
+						? deck[k]["learning"]
+						: 0,
+					review: deck[k].hasOwnProperty("review")
+						? deck[k]["review"]
+						: 0,
 				};
-				if (isEqual(Object.keys(deck[k]).sort(), endKeys)) {
-					item["newCard"] += deck[k]["newCard"];
-					item["learning"] += deck[k]["learning"];
-					item["review"] += deck[k]["review"];
-				} else {
+				if (!isEqual(Object.keys(deck[k]).sort(), endKeys)) {
 					for (let c of item.children) {
-						item["newCard"] += c["newCard"];
-						item["learning"] += c["learning"];
-						item["review"] += c["review"];
+						// @ts-ignore
+						endKeys.forEach((value) => (item[value] += c[value]));
 					}
 				}
 				deckList.push(item);

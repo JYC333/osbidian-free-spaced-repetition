@@ -2,10 +2,12 @@ import { ButtonComponent, MarkdownRenderer, Notice, TFile } from "obsidian";
 import { FSRRating } from "src/constants";
 import FreeSpacedRepetition from "src/main";
 import { FSRSubView, ReviewCard } from "src/types";
-import { switchView } from "src/utils";
 
 import { t } from "src/lang/utils";
+import { CardEditorModal } from "src/modals/cardEditorModal";
+import { getCardText, switchView } from "src/utils/utils";
 import { FSRView } from "src/views/view";
+import { isEqual } from "lodash";
 
 export class ReviewView implements FSRSubView {
 	view: FSRView;
@@ -21,6 +23,7 @@ export class ReviewView implements FSRSubView {
 
 	currentQueue: ReviewCard[];
 	currentReview: number;
+	editing: any = {};
 
 	deckInfo: Record<string, string>;
 
@@ -133,9 +136,13 @@ export class ReviewView implements FSRSubView {
 		});
 	}
 
-	async set(currentQueue: ReviewCard[], deckInfo: Record<string, string>) {
+	async set(
+		currentQueue: ReviewCard[],
+		deckInfo: Record<string, string>,
+		pointer: any = null
+	) {
 		this.initView();
-		console.log(currentQueue);
+		// console.log(currentQueue);
 		if (currentQueue.length === 0) {
 			this.tapEl.style.display = "none";
 			this.finishEl.style.display = "flex";
@@ -152,7 +159,18 @@ export class ReviewView implements FSRSubView {
 			this.deckInfo = deckInfo;
 
 			let randomIndex = Math.floor(Math.random() * currentQueue.length);
-			let pointer = currentQueue[randomIndex];
+			if (pointer) {
+				for (let i = 0; i < currentQueue.length; i++) {
+					if (isEqual(pointer, currentQueue[i])) {
+						randomIndex = i;
+						break;
+					}
+				}
+			} else {
+				pointer = currentQueue[randomIndex];
+			}
+
+			this.editing["ind"] = pointer.cardIndex;
 
 			this.currentReview = randomIndex;
 
@@ -161,57 +179,57 @@ export class ReviewView implements FSRSubView {
 					pointer.cardIndex
 				];
 
+			this.editing["question"] = card.question;
+			this.editing["answer"] = card.answer;
+
 			let file = this.plugin.app.vault.getAbstractFileByPath(
 				pointer.fileName
 			);
 
-			let question, answer;
-			if (typeof card.question === "string") {
-				question = "### " + card.question;
-				while (question.startsWith("#")) {
-					question = question.slice(1, question.length);
-					question = question.trim();
-				}
-				question = `# ${question}`;
-			}
-
-			if (typeof card.answer === "string") {
-				answer = card.answer;
-			}
+			let fileContent: string = "";
 
 			if (file instanceof TFile) {
-				await this.plugin.app.vault.cachedRead(file).then((c) => {
-					if (typeof card.question === "object") {
-						question = c.substring(
-							card.question.start,
-							card.question.end + 1
-						);
-					}
-					if (typeof card.answer === "object") {
-						answer = c.substring(
-							card.answer.start,
-							card.answer.end + 1
-						);
-					}
-				});
+				this.editing["file"] = file;
+				await this.plugin.app.vault
+					.cachedRead(file)
+					.then((c) => (fileContent = c));
 			}
 
-			MarkdownRenderer.render(
+			await MarkdownRenderer.render(
 				this.plugin.app,
-				question as string,
+				getCardText(card.question, fileContent),
 				this.questionEl,
 				pointer.fileName,
 				this.view
 			);
 
-			MarkdownRenderer.render(
+			await MarkdownRenderer.render(
 				this.plugin.app,
-				answer as string,
+				getCardText(card.answer, fileContent),
 				this.answerContentEl,
 				pointer.fileName,
 				this.view
 			);
 		}
+	}
+
+	openCardEditor() {
+		new CardEditorModal(this.plugin.app, this.editing.file, this.plugin, {
+			question: this.editing.question,
+			answer: this.editing.answer,
+			ind: this.editing.ind,
+		}).open();
+	}
+
+	refreshView(pointer = null) {
+		switchView(this.plugin, {
+			mode: "review",
+			deck: this.deckInfo.deck,
+			deckType: this.deckInfo.deckType,
+			buildQueue: false,
+			currentQueue: this.currentQueue,
+			pointer: pointer,
+		});
 	}
 
 	show() {

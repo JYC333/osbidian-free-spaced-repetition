@@ -2,14 +2,14 @@ import { Notice, Plugin, TFile, TFolder, WorkspaceLeaf } from "obsidian";
 
 import Commands from "src/commands";
 import { DEFAULT_SETTINGS } from "src/constants";
-import { NoteDeletionWarningModal } from "src/modals";
+import { NoteDeletionWarningModal } from "src/modals/modals";
 import { FSRSettingTab } from "src/settings";
 import { DataStore } from "src/store";
 import { FSRSettings } from "src/types";
-import { switchView } from "src/utils";
 import { BrowseSidebarView } from "src/views/browseSidebarView";
 
 import { t } from "src/lang/utils";
+import { switchView } from "src/utils/utils";
 import { FSRView } from "src/views/view";
 
 export default class FreeSpacedRepetition extends Plugin {
@@ -125,7 +125,7 @@ export default class FreeSpacedRepetition extends Plugin {
 			})
 		);
 
-		this.addRibbonIcon("pencil", t("CREART_CARD_RIBBON"), () => {
+		this.addRibbonIcon("pencil", t("CREATE_CARD_RIBBON"), () => {
 			let file = this.app.workspace.getActiveFile();
 			if (file) {
 				this.commands.createCard(file);

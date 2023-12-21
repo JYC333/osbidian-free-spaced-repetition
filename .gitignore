@@ -18,6 +18,7 @@ main.js
 # obsidian
 data.json
 tracked_files.json
+FSRData.json
 
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store
