@@ -168,7 +168,7 @@ export function getCardText(
 				if (typeof d === "string") {
 					text += d;
 				} else {
-					text += fileContent.substring(d.start, d.end + 1);
+					text += fileContent.substring(d.start, d.end);
 				}
 			});
 			break;

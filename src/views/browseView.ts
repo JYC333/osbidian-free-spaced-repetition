@@ -12,6 +12,8 @@ import { GridApi, GridOptions, createGrid } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
+import { cloneDeep } from "lodash";
+
 export class BrowseView implements FSRSubView {
 	plugin: FreeSpacedRepetition;
 
@@ -94,7 +96,7 @@ export class BrowseView implements FSRSubView {
 		}
 	}
 
-	filterTableData(filters: Filter = DEFAULT_FILTER) {
+	filterTableData(filters: Filter = cloneDeep(DEFAULT_FILTER)) {
 		let filteredTableData: TableData[] = [...this.tableData];
 		for (let filter in filters) {
 			console.log(filter, filters[filter]);

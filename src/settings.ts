@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { DataLocation } from "src/constants";
+import { DataLocation, TrackMode } from "src/constants";
 import FreeSpacedRepetition from "src/main";
 
 import { t } from "src/lang/utils";
@@ -72,6 +72,21 @@ export class FSRSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 						this.plugin.currentView?.deckView.refreshView();
 					});
+			});
+
+		new Setting(containerEl)
+			.setName(t("TRACK_MODE"))
+			.setDesc(t("TRACK_MODE_DESC"))
+			.addDropdown((dropdown) => {
+				dropdown.addOption(TrackMode.Character, TrackMode.Character);
+				dropdown.addOption(TrackMode.Section, TrackMode.Section);
+				dropdown.setValue(this.plugin.settings.trackMode);
+
+				dropdown.onChange((val) => {
+					this.plugin.settings.trackMode = val;
+					this.plugin.saveData(this.plugin.settings);
+					this.display();
+				});
 			});
 	}
 }

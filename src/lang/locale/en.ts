@@ -51,8 +51,9 @@ export default {
 	SIDEBAR_CARD_DECKS: "Decks",
 
 	// main.ts
-	CREATE_CARD_RIBBON: "Create Card",
+	CARD_EDITOR_RIBBON: "Card Editor",
 	REVIEW_CARD_RIBBON: "Review Card",
+	UPDATE_CARD_MESSAGE: "Update cards form note: ${note}",
 
 	// settings.ts
 	SETTING_HEADER: "Free Spaced Repetition",
@@ -64,6 +65,8 @@ export default {
 		"Where to store the data file for free spaced repetition items in Vault.",
 	ROOT_DECK: "Root Deck",
 	ROOT_DECK_DESC: "Folder deck name for notes at vault root.",
+	TRACK_MODE: "Track Mode",
+	TRACK_MODE_DESC: "Different tracking mode for note",
 
 	// Modals
 	// modals/modals.ts

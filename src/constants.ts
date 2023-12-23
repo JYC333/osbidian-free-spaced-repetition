@@ -1,4 +1,4 @@
-import { FSRSettings, Filter } from "src/types";
+import { CharacterTracker, FSRSettings, Filter } from "src/types";
 
 const fsrsJs = require("fsrs.js");
 
@@ -16,10 +16,18 @@ export const FSRState = {
 	Relearning: fsrsJs.State.Relearning,
 };
 
+export const INIT_CHANGETRACKER: CharacterTracker = {
+	cursor: { current: 0, previous: -1 },
+	total: { current: 0, previous: 0 },
+	start: 0,
+	startTotal: 0,
+};
+
 export const DEFAULT_SETTINGS: FSRSettings = {
 	dataLocation: "In Plugin Folder",
 	dataLocationPath: "./",
 	folderDeckRootName: "Root",
+	trackMode: "Section",
 };
 
 export const PLUGIN_DATA_PATH: string =
@@ -55,6 +63,11 @@ export enum DataLocation {
 export enum DeckType {
 	FolderDeck = "FolderDeck",
 	CustomizedDeck = "CustomizedDeck",
+}
+
+export enum TrackMode {
+	Character = "Character",
+	Section = "Section",
 }
 
 export enum FilterType {

@@ -6,6 +6,8 @@ import { Filter } from "src/types";
 
 import { t } from "src/lang/utils";
 
+import { cloneDeep } from "lodash";
+
 export class BrowseSidebarView extends ItemView {
 	plugin: FreeSpacedRepetition;
 	init: boolean;
@@ -15,7 +17,7 @@ export class BrowseSidebarView extends ItemView {
 	cardState: any[];
 	decks: any[];
 
-	filter: Filter = DEFAULT_FILTER;
+	filter: Filter = cloneDeep(DEFAULT_FILTER);
 
 	rootTitle: string[] = [t("SIDEBAR_CARD_STATE"), t("SIDEBAR_CARD_DECKS")];
 

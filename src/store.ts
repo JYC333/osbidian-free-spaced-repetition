@@ -29,14 +29,13 @@ export class DataStore {
 		} else {
 			this.dataPath = this.plugin.settings.dataLocationPath;
 		}
-		this.load();
 	}
 
 	/**
 	 * load.
 	 */
 	async load() {
-		let adapter = this.plugin.app.vault.adapter;
+		const { adapter } = this.plugin.app.vault;
 
 		if (await adapter.exists(this.dataPath)) {
 			let data = await adapter.read(this.dataPath);

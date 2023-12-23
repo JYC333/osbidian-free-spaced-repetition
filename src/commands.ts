@@ -57,45 +57,45 @@ export default class Commands {
 	}
 
 	createCard(file: TFile) {
-		const fileName = file.path;
-		const { data } = this.plugin.dataStore;
-		if (!data.trackedNotes.hasOwnProperty(fileName)) {
-			data.trackedNotes[fileName] = [];
-		}
-		const fileCache = this.plugin.app.metadataCache.getFileCache(file);
-		const newCard: Card = {
-			question: file.basename,
-			answer: [
-				{
-					start: 0,
-					// @ts-ignore
-					end: fileCache?.sections[fileCache.sections?.length - 1]
-						.position.end.offset,
-				},
-			],
-			type: "basic",
-			decks: [],
-			FSRInfo: new fsrsJs.Card(),
-		};
+		// const fileName = file.path;
+		// const { data } = this.plugin.dataStore;
+		// if (!data.trackedNotes.hasOwnProperty(fileName)) {
+		// 	data.trackedNotes[fileName] = [];
+		// }
+		// const fileCache = this.plugin.app.metadataCache.getFileCache(file);
+		// const newCard: Card = {
+		// 	question: file.basename,
+		// 	answer: [
+		// 		{
+		// 			start: 0,
+		// 			// @ts-ignore
+		// 			end: fileCache?.sections[fileCache.sections?.length - 1]
+		// 				.position.end.offset,
+		// 		},
+		// 	],
+		// 	type: "basic",
+		// 	decks: [],
+		// 	FSRInfo: new fsrsJs.Card(),
+		// };
 
-		const cardInd = checkExistence(newCard, data.trackedNotes[fileName]);
+		// const cardInd = checkExistence(newCard, data.trackedNotes[fileName]);
 
-		if (cardInd === -1) {
-			data.trackedNotes[fileName].push(newCard);
+		// if (cardInd === -1) {
+		// 	data.trackedNotes[fileName].push(newCard);
 
-			console.log(`Create card for note: ${fileName}`);
-		} else {
-			console.log(`Card duplicated for note: ${fileName}`);
-		}
+		// 	console.log(`Create card for note: ${fileName}`);
+		// } else {
+		// 	console.log(`Card duplicated for note: ${fileName}`);
+		// }
 
-		const deck = getFolderPath(fileName, this.plugin);
-		if (!data.folderDeck.hasOwnProperty(deck)) {
-			data.folderDeck[deck] = [fileName];
-		} else {
-			data.folderDeck[deck] = [
-				...new Set([...data.folderDeck[deck], fileName]),
-			];
-		}
+		// const deck = getFolderPath(fileName, this.plugin);
+		// if (!data.folderDeck.hasOwnProperty(deck)) {
+		// 	data.folderDeck[deck] = [fileName];
+		// } else {
+		// 	data.folderDeck[deck] = [
+		// 		...new Set([...data.folderDeck[deck], fileName]),
+		// 	];
+		// }
 		new CardEditorModal(this.plugin.app, file, this.plugin).open();
 
 		this.plugin.dataStore.save();

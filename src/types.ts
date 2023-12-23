@@ -2,6 +2,25 @@ export interface FSRSettings {
 	dataLocation: string;
 	dataLocationPath: string;
 	folderDeckRootName: string;
+	trackMode: string;
+}
+
+interface CurrentPrevious {
+	current: number;
+	previous: number;
+}
+
+export interface EditStep {
+	start: number;
+	end: number;
+	total: number;
+}
+
+export interface CharacterTracker {
+	cursor: CurrentPrevious;
+	total: CurrentPrevious;
+	start: number;
+	startTotal: number;
 }
 
 export interface TextOffset {
