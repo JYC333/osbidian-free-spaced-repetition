@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-free-spaced-repetition",
 	"version": "0.1.0",
-	"description": "Spaced repetition for Obsidian notes",
+	"description": "Spaced repetition for Obsidian notes in a clean and seamless way",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node scripts/esbuild.config.mjs",
