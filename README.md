@@ -43,4 +43,4 @@ Thank you to everyone who has created a plugin that inspired me and I took code 
 
 ### LICENSE
 
-MIT
+[MIT](LICENSE)
